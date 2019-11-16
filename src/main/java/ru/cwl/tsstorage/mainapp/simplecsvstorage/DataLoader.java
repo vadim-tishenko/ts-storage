@@ -4,9 +4,7 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -16,35 +14,15 @@ import java.util.List;
 @Component
 public class DataLoader {
 
-    final String srcPath = "C:\\dev\\tmp\\refr\\";
-
-//    @PostConstruct
-    public void loadFromDisk() throws FileNotFoundException {
-
-
-        List<TrafficCvs> result = loadTraffic();
-
-        List<TfcSensorCvs> result2 = getTfcSensorCvs();
-
-        List<TfcSensorCvs> resultAll = loadTfcSensorCvs();
-
-
-        System.out.println(result2.size());
-
-        System.out.println(resultAll.size());
-
-    }
+    private static final String SRC_PATH = "C:\\dev\\tmp\\refr\\";
 
     List<TfcSensorCvs> getTfcSensorCvs() throws FileNotFoundException {
-        final String fileName = srcPath + "TFC_SENSOR_21007.tsv";
-
-        final Class aClass = TfcSensorCvs.class;
-
-        return loadTsv(fileName, aClass);
+        final String fileName = SRC_PATH + "TFC_SENSOR_21007.tsv";
+        return loadTsv(fileName, TfcSensorCvs.class);
     }
 
     List<TfcSensorCvs> loadTfcSensorCvs() throws FileNotFoundException {
-        String inFiles[] = {
+        String[] inFiles = {
                 "TFC_SENSOR_3.tsv",
                 "TFC_SENSOR_21007.tsv",
                 "TFC_SENSOR_111007.tsv",
@@ -58,18 +36,18 @@ public class DataLoader {
         List<TfcSensorCvs> resultAll = new ArrayList<>();
 
         for (String inFile : inFiles) {
-            List<TfcSensorCvs> result3 = loadTsv(srcPath + inFile, TfcSensorCvs.class);
+            List<TfcSensorCvs> result3 = loadTsv(SRC_PATH + inFile, TfcSensorCvs.class);
             resultAll.addAll(result3);
         }
         return resultAll;
     }
 
     List<TrafficCvs> loadTraffic() throws FileNotFoundException {
-        return loadTsv(srcPath + "TRAFFIC.tsv", TrafficCvs.class);
+        return loadTsv(SRC_PATH + "TRAFFIC.tsv", TrafficCvs.class);
     }
 
     private <T> List<T> loadTsv(String fileName, Class<T> aClass) throws FileNotFoundException {
-        HeaderColumnNameToPropertyMappingStrategy<T> mappingStrategy = new HeaderColumnNameToPropertyMappingStrategy<T>(aClass);
+        HeaderColumnNameToPropertyMappingStrategy<T> mappingStrategy = new HeaderColumnNameToPropertyMappingStrategy<>(aClass);
 
         CsvToBean<T> tsvToBean = new CsvToBeanBuilder<T>(new FileReader(fileName))
                 .withSeparator('\t')
